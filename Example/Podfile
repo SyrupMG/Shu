@@ -1,5 +1,5 @@
 use_frameworks!
-target 'Shu_Tests' do
+target 'iOS-Example' do
   pod 'Shu', :path => '../'
   
   
