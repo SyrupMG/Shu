@@ -14,7 +14,7 @@ PODS:
     - PromiseKit/CorePromise
   - PromiseKit/UIKit (6.5.2):
     - PromiseKit/CorePromise
-  - Shu (1.0.1):
+  - Shu (1.0.2):
     - Alamofire
     - AlamofireActivityLogger
     - PromiseKit
@@ -37,7 +37,7 @@ SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
   AlamofireActivityLogger: 4dbb52cbd9a26590775df5d4d0284fa81f9b9b5b
   PromiseKit: 27c1601bfb73405871b805bcb8cf7e55c4dad3db
-  Shu: 125bdaf2033a54f60161deb5965dac545bf58a18
+  Shu: 5674c2ae130dc3f2848bc0fe691bb2354a80c6b1
 
 PODFILE CHECKSUM: bd86c749b43d0349cb56ce5f18e11e7c69112375
 
