@@ -8,42 +8,48 @@
 
 import UIKit
 import Shu
+import PromiseKit
 
-class ExampleApiErrorMaker: ApiServiceErrorMaker {
-    func error(fromStatusCode statusCode: Int, data: Data?) -> ApiServiceError? {
-        return nil
-    }
+class Todo: Codable, ApiMappable {
+    static var apiMapper: ApiMapper { return JSONApiMapper() }
     
-    static let shared = ExampleApiErrorMaker()
-}
-
-class Todo: Codable {
+    var id: Int = 0
     var userId: Int = 0
     var title: String = ""
     var completed: Bool = false
 }
 
-class TodoGetRequest: CodableJSONApiRequest<DummyPayload, Todo> {
-    private let path = "/todos/"
-    init(id: Int) {
-        super.init(pathPart: path + "\(id)", httpMethod: .get, payload: nil)
+class TodoResource: CRUDApiResource<Todo> {
+    convenience init() {
+        self.init(collectionPath: "/todos/")
     }
 }
 
 class ViewController: UIViewController {
-    private let apiService = ApiService(baseUrl: "https://jsonplaceholder.typicode.com/", errorMaker: ExampleApiErrorMaker.shared)
+    private let apiService = ShuApiService(baseUrl: "https://jsonplaceholder.typicode.com/")
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        apiService.setAsMain()
         // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        apiService.make(request: TodoGetRequest(id: 1))
-            .done {
-                print($0)
-        }
+        
+        let resource = TodoResource()
+
+        resource.list()
+            .then { todos  in
+                return resource.read(resourceId: "\(todos.first!.id)")
+            }
+            .then { todo -> Shu.Operation<Todo> in
+                todo.title = "teta gamma delta"
+                return resource.update(resourceId: "\(todo.id)", object: todo)
+            }
+        
+//        apiService.make(request: TodoGetRequest(id: 1))
+//            .done { print($0) }
     }
 }
 
