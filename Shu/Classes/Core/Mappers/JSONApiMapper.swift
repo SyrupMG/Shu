@@ -8,14 +8,15 @@
 import Foundation
 
 public class JSONApiMapper: ApiMapper {
+    public init() {}
+
     private let decoder = JSONDecoder()
-    
-    public override func decode<T: ApiMappable>(_ data: Data) throws -> T {
+    public func decode<T>(_ data: Data) throws -> T where T : ApiMappable {
         return try decoder.decode(T.self, from: data)
     }
     
     private let jsonEncoder = JSONEncoder()
-    public override func encodeToData<T: ApiMappable>(_ object: T) -> Data? {
+    public func encodeToData<T>(_ object: T) -> Data? where T : ApiMappable {
         return try? jsonEncoder.encode(object)
     }
 }

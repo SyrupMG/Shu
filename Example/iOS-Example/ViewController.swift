@@ -11,7 +11,7 @@ import Shu
 import PromiseKit
 
 class Todo: Codable, ApiMappable {
-    static var apiMapper: ApiMapper { return JSONApiMapper() }
+    static var apiMapper: ApiMapper = JSONApiMapper()
     
     var id: Int = 0
     var userId: Int = 0
