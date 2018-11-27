@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 import PromiseKit
 
-protocol Middleware {
+public protocol Middleware {
     typealias HeadersMutationBlock = (HTTPHeaders) -> HTTPHeaders
     func headers(_ headersMutationBlock: @escaping HeadersMutationBlock)
     

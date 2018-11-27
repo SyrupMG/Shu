@@ -10,9 +10,13 @@ import Alamofire
 import PromiseKit
 
 public protocol ApiService {
+    typealias MiddlewareConfigBlock = (Middleware) -> Void
+
     init(baseUrl: String)
     func make<ResultType>(operation: Operation<ResultType>) -> Promise<ResultType>
     func makeRaw<ResultType>(operation: Operation<ResultType>) -> Promise<DefaultDataResponse>
+    
+    func addMiddleware(_ middlewareConfigBlock: MiddlewareConfigBlock)
 }
 
 extension ApiService {

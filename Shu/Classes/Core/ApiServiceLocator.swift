@@ -8,8 +8,9 @@
 import Foundation
 
 public final class ApiServiceLocator {
+    public static var mainApiServiceClosure: () -> ApiService? = { return nil }
     public static func setMain(_ apiService: ApiService) {
-        self.mainApiService = apiService
+        mainApiServiceClosure = { return apiService }
     }
-    private(set) static var mainApiService: ApiService?
+    static var mainApiService: ApiService? { return mainApiServiceClosure() }
 }

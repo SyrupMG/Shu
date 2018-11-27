@@ -12,20 +12,6 @@ import Alamofire
 import AlamofireActivityLogger
 
 public class ShuApiService: ApiService {
-    private let baseUrl: String
-    private let sessionManager: SessionManager
-
-    private var middlewares = [BasicMiddleware]()
-
-    required public init(baseUrl: String) {
-        let configuration = URLSessionConfiguration.default
-        sessionManager = Alamofire.SessionManager(configuration: configuration)
-
-        self.baseUrl = baseUrl
-    }
-
-    private func defaultHeaders() -> HTTPHeaders { return [:] }
-    
     private class BasicMiddleware: Middleware {
         fileprivate var headersMutationBlock: HeadersMutationBlock?
         func headers(_ headersMutationBlock: @escaping HeadersMutationBlock) {
@@ -43,7 +29,24 @@ public class ShuApiService: ApiService {
         }
     }
 
-    func addMiddleware(_ middlewareConfigBlock: (Middleware) -> Void) {
+    private let baseUrl: String
+    private let sessionManager: SessionManager
+    private var middlewares = [BasicMiddleware]()
+    
+    // MARK: -init
+
+    required public init(baseUrl: String) {
+        let configuration = URLSessionConfiguration.default
+        sessionManager = Alamofire.SessionManager(configuration: configuration)
+
+        self.baseUrl = baseUrl
+    }
+    
+    // MARK: - methods
+
+    private func defaultHeaders() -> HTTPHeaders { return [:] }
+
+    public func addMiddleware(_ middlewareConfigBlock: MiddlewareConfigBlock) {
         let middleware = BasicMiddleware()
         middlewareConfigBlock(middleware)
         middlewares.append(middleware)
