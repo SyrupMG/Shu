@@ -31,6 +31,77 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         apiService.setAsMain()
+        // Ожидается, что добавится заголовок X-Foo со значение "Bar"
+        apiService.addMiddleware {
+            $0.headers { return ["X-Foo": "Bar"] }
+        }
+        // Ожидается, что добавится заголовок X-Bar со значение "Some"
+        apiService.addMiddleware {
+            $0.headers { return ["X-Bar":"Some"] }
+        }
+        // Ожидается, что заголовок "X-Foo" будет заменен на новый со значение "Bar1",
+        // т.к. этот мидлвар добавлен позже и будет обработан с большим приориететом
+        apiService.addMiddleware {
+            $0.headers { return ["X-Foo": "Bar1"] }
+        }
+        
+        
+        // Ожидается, что этот блок будет вызываться на ВСЕХ успешных вызовах apiService.
+        // Можно использовать для того, чтобы ВСЕГДА делать какое-то действие
+        apiService.addMiddleware {
+            $0.success {
+                if let todos = $0 as? [Todo] {
+                    print("""
+                        🅰️🅰️🅰️
+                        🅰️🅰️🅰️
+                        Получили [TODO]
+                        🅰️🅰️🅰️
+                        🅰️🅰️🅰️
+                    """)
+                }
+                if let todo = $0 as? Todo {
+                    print("""
+                        🅰️🅰️🅰️
+                        🅰️🅰️🅰️
+                        Получили TODO
+                        🅰️🅰️🅰️
+                        🅰️🅰️🅰️
+                    """)
+                }
+                type(of: $0)
+            }
+        }
+        
+        apiService.addMiddleware {
+            $0.requestBarier {
+                if let todosOperation = $0 as? Shu.Operation<[Todo]> {
+                    print("""
+                        🅱️🅱️🅱️
+                        🅱️🅱️🅱️
+                        Операция будет заблокирована на 5 секунд
+                        Shu.Operation<[Todo]>
+                        🅱️🅱️🅱️
+                        🅱️🅱️🅱️
+                    """)
+                    return after(seconds: 5).asVoid()
+                }
+                
+                if let todoOperation = $0 as? Shu.Operation<Todo> {
+                    print("""
+                        🅱️🅱️🅱️
+                        🅱️🅱️🅱️
+                        Операция будет заблокирована на 7 секунд
+                        Shu.Operation<Todo>
+                        🅱️🅱️🅱️
+                        🅱️🅱️🅱️
+                    """)
+                    return after(seconds: 7).asVoid()
+                }
+                
+                return Promise.value(())
+            }
+        }
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     
