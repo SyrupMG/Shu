@@ -19,7 +19,7 @@
 		05E9A98066BFF6C8A2DC4543 /* Pods-Shu_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Shu_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Shu_Tests/Pods-Shu_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		0631727E76BF2C019A715D47 /* Pods_Shu_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Shu_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		24874A24E3E9C9AE37ECFCF4 /* Pods_iOS_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iOS_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C6F150BD5EBD643A1B48B5D /* Shu.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Shu.podspec; path = ../Shu.podspec; sourceTree = "<group>"; };
+		5C6F150BD5EBD643A1B48B5D /* Shu.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Shu.podspec; path = ../Shu.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		64C51CDFC3E5F6EBB635CB54 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		66470F838B4DDB876AA552FF /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		A0371D942176172E00CFF82B /* iOS-Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-Example.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -209,7 +209,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-iOS-Example/Pods-iOS-Example-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-iOS-Example/Pods-iOS-Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/AlamofireActivityLogger/AlamofireActivityLogger.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
@@ -226,7 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-iOS-Example/Pods-iOS-Example-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-iOS-Example/Pods-iOS-Example-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

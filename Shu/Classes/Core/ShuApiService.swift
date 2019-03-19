@@ -13,9 +13,14 @@ import AlamofireActivityLogger
 
 public class ShuApiService: ApiService {
     private class BasicMiddleware: Middleware {
-        fileprivate var headersMutationBlock: HeadersMutationBlock?
-        func headers(_ headersMutationBlock: @escaping HeadersMutationBlock) {
-            self.headersMutationBlock = headersMutationBlock
+        fileprivate var headersExtensionBlock: HeadersExtensionBlock?
+        func headers(_ headersExtensionBlock: @escaping HeadersExtensionBlock) {
+            self.headersExtensionBlock = headersExtensionBlock
+        }
+        
+        fileprivate var requestBarierBlock: RequestBarierBlock?
+        func requestBarier(_ requestBarierBlock: @escaping RequestBarierBlock) {
+            self.requestBarierBlock = requestBarierBlock
         }
         
         fileprivate var responseValidationBlock: ResponseValidationBlock?
@@ -26,6 +31,11 @@ public class ShuApiService: ApiService {
         fileprivate var recoverBlock: RecoverBlock?
         func recover(_ recoverBlock: @escaping RecoverBlock) {
             self.recoverBlock = recoverBlock
+        }
+        
+        fileprivate var successBlock: SuccessBlock?
+        func success(_ successBlock: @escaping SuccessBlock) {
+            self.successBlock = successBlock
         }
     }
 
@@ -43,8 +53,6 @@ public class ShuApiService: ApiService {
     }
     
     // MARK: - methods
-
-    private func defaultHeaders() -> HTTPHeaders { return [:] }
 
     public func addMiddleware(_ middlewareConfigBlock: MiddlewareConfigBlock) {
         let middleware = BasicMiddleware()
@@ -64,11 +72,10 @@ public class ShuApiService: ApiService {
     
     private func make<ResultType>(operation: Operation<ResultType>) -> DataRequest {
         let preparedUrl = prepareUrl(fromBase: baseUrl, andParts: operation.path)
-        var headers = defaultHeaders()
         
-        middlewares.forEach {
-            guard let mutateHeaders = $0.headersMutationBlock else { return }
-            headers = mutateHeaders(headers)
+        var headers = HTTPHeaders()
+        middlewares.forEach { middleware in
+            headers.merge(middleware.headersExtensionBlock?() ?? [:]) { _, new in new }
         }
         
         let encoding = operation.encoding ?? URLEncoding.default
@@ -97,7 +104,7 @@ public class ShuApiService: ApiService {
         #endif
         
         dataRequest.validate({ (request, response, data) -> Request.ValidationResult in
-            // look thru all the middlewares for first responsevalidationblock to thrwo error
+            // look thru all the middlewares for first responseValidationBlock to throw error
             if let error = self.middlewares.firstResult(where: { (middleware) -> Error? in
                 // if there is any validationblock
                 guard let validate = middleware.responseValidationBlock else { return nil }
@@ -131,16 +138,22 @@ public class ShuApiService: ApiService {
     }
 
     public func make<ResultType>(operation: Operation<ResultType>) -> Promise<ResultType> {
-        let dataRequest: DataRequest = make(operation: operation)
-
-        return dataRequest
-            .response(.promise)
-            .map { (request, response, data) in
-                return try ResultType.apiMapper.decode(data)
+        let barierBlocks = middlewares.compactMap { $0.requestBarierBlock }
+        return when(fulfilled: barierBlocks.map { $0(operation) }).then { _ -> Promise<ResultType> in
+            let dataRequest: DataRequest = self.make(operation: operation)
+            
+            return dataRequest
+                .response(.promise)
+                .map { (request, response, data) -> ResultType in
+                    let res: ResultType = try ResultType.apiMapper.decode(data)
+                    self.middlewares.forEach { $0.successBlock?(res) }
+                    return res
+                }
+                .recover { error throws -> Promise<ResultType> in
+                    return self.handle(error: error, for: operation) as Promise<ResultType>
             }
-            .recover { error throws -> Promise<ResultType> in
-                return self.handle(error: error, for: operation) as Promise<ResultType>
-            }
+        }
+        
     }
 
     private func handle<ResultType>(error: Error, for operation: Operation<ResultType>) -> Promise<ResultType> {
