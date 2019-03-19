@@ -14,9 +14,12 @@ public typealias HTTPMethod = Alamofire.HTTPMethod
 
 public class Operation<ResultType: ApiMappable>: Thenable {
     // MARK: - Thenable
+    
+    private lazy var cancelationPromise = Promise<ResultType>.pending()
     private lazy var promise = ApiServiceLocator.mainApiService!.make(operation: self)
+    
     public func pipe(to: @escaping (PromiseKit.Result<ResultType>) -> Void) {
-        promise.pipe(to: to)
+        race([cancelationPromise.promise, promise]).pipe(to: to)
     }
     public var result: PromiseKit.Result<ResultType>? { return promise.result }
     
@@ -37,6 +40,7 @@ public class Operation<ResultType: ApiMappable>: Thenable {
     }
     
     public func cancel() {
-        // TODO: - cancellable
+        // TODO: - дополнительно надо отменять сетевую операцию, иначе как-то бессмысленно
+        cancelationPromise.resolver.reject(PMKError.cancelled)
     }
 }
