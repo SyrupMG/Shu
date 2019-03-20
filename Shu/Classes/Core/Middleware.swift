@@ -25,7 +25,12 @@ public protocol Middleware {
     typealias ResponseValidationBlock = (_: Int, _ data: Data?) throws -> Void
     func validateResponse(_ responseValidationBlock: @escaping ResponseValidationBlock)
     
-    typealias RecoverBlock = (Error) -> Promise<Void>
+    /**
+     Следует ожидать, что на вход в блок в месте Any попадет **Operation<T: ApiMappable>**
+     
+     см. RequestBarierBlock
+     */
+    typealias RecoverBlock = (Error, Any) -> Promise<Void>
     func recover(_ recoverBlock: @escaping RecoverBlock)
     
     /**

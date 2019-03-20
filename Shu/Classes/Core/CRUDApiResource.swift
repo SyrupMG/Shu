@@ -10,7 +10,7 @@ import Alamofire
 
 open class CRUDApiResource<ResourceModel: ApiMappable> {
     public let collectionPath: String
-    public init(collectionPath: String) {
+    public required init(collectionPath: String) {
         self.collectionPath = collectionPath
     }
     
