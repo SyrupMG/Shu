@@ -159,7 +159,7 @@ public class ShuApiService: ApiService {
     private func handle<ResultType>(error: Error, for operation: Operation<ResultType>) -> Promise<ResultType> {
         var errorPromisesIterator = middlewares
             .compactMap { $0.recoverBlock }
-            .map { $0(error) }.lazy.makeIterator()
+            .map { $0(error, operation) }.lazy.makeIterator()
         
         func next() -> Promise<Void> {
             // If there is any next recover block, try it
