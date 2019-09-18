@@ -78,8 +78,6 @@ public class ShuApiService: ApiService {
             headers.merge(middleware.headersExtensionBlock?() ?? [:]) { _, new in new }
         }
         
-        let encoding = operation.encoding ?? URLEncoding.default
-        
         var dataRequest: DataRequest!
         
         var urlComps = URLComponents(string: preparedUrl)!

@@ -10,7 +10,7 @@ import Foundation
 extension Array {
     func firstResult<T>(where predicate: (Element) -> T?) -> T? {
         var lastResult: T?
-        first {
+        _ = first {
             lastResult = predicate($0)
             return lastResult != nil
         }
