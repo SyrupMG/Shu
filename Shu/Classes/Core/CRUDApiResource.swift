@@ -10,55 +10,51 @@ import Alamofire
 
 open class CRUDApiResource<ResourceModel: ApiMappable> {
     public let collectionPath: String
-    public required init(collectionPath: String) {
+    public let apiServiceId: ApiServiceLocator.ApiServiceProducerId
+    
+    public required init(collectionPath: String, apiServiceId: ApiServiceLocator.ApiServiceProducerId = ApiServiceLocator.mainApiServiceId) {
         self.collectionPath = collectionPath
+        self.apiServiceId = apiServiceId
     }
     
     // GET on resource
     public final func read(resourceId: String) -> Operation<ResourceModel> {
-        return Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .get)
+        return Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .get, apiServiceId: apiServiceId)
     }
     
     /// GET on collection
     public final func list() -> Operation<[ResourceModel]> {
-        return Operation<[ResourceModel]>(path: collectionPath, httpMethod: .get)
+        return Operation<[ResourceModel]>(path: collectionPath, httpMethod: .get, apiServiceId: apiServiceId)
     }
     
-    private func uploadPayload(for object: ResourceModel) -> Operation<ResourceModel>.Payload {
-        if let _ = object as? [Any] {
-            guard let jsonData = ResourceModel.apiMapper.encodeToData(object) else { return .httpBody(nil) }
-            return .httpBody(jsonData)
-        } else {
-            guard let jsonData = ResourceModel.apiMapper.encodeToData(object),
-                let jsonObject = try? JSONSerialization.jsonObject(with: jsonData, options: []),
-                let parameters = jsonObject as? Parameters else { return .parameters(nil) }
-            return .parameters(parameters)
-        }
+    private func bodyPayload(for object: ResourceModel) -> Data? {
+        guard let jsonData = ResourceModel.apiMapper.encodeToData(object) else { return nil }
+        return jsonData
     }
     
     /// POST
     public final func create(object: ResourceModel) -> Operation<ResourceModel> {
-        let operation = Operation<ResourceModel>(path: collectionPath, httpMethod: .post)
+        let operation = Operation<ResourceModel>(path: collectionPath, httpMethod: .post, apiServiceId: apiServiceId)
         
         operation.encoding = JSONEncoding.default
-        operation.requestPayload = uploadPayload(for: object)
+        operation.httpBody = bodyPayload(for: object)
         
         return operation
     }
     
     /// PUT on resource
     public final func update(resourceId: String, object: ResourceModel) -> Operation<ResourceModel> {
-        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .put)
+        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .put, apiServiceId: apiServiceId)
         
         operation.encoding = JSONEncoding.default
-        operation.requestPayload = uploadPayload(for: object)
+        operation.httpBody = bodyPayload(for: object)
         
         return operation
     }
     
     /// DELETE on resource
     public final func delete(resourceId: String) -> Operation<ResourceModel> {
-        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .delete)
+        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .delete, apiServiceId: apiServiceId)
         return operation
     }
 }

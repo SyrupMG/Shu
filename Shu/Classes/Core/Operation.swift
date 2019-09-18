@@ -13,30 +13,33 @@ import PromiseKit
 public typealias HTTPMethod = Alamofire.HTTPMethod
 
 public class Operation<ResultType: ApiMappable>: Thenable {
+    enum Error: Swift.Error {
+        case apiServiceNotFound
+    }
+    
     // MARK: - Thenable
     
     private lazy var cancelationPromise = Promise<ResultType>.pending()
-    private lazy var promise = ApiServiceLocator.mainApiService!.make(operation: self)
+    private lazy var promise = ApiServiceLocator.makeService(withIdentifier: apiServiceId)?.make(operation: self) ?? Promise(error: Error.apiServiceNotFound)
+    private let apiServiceId: ApiServiceLocator.ApiServiceProducerId
     
     public func pipe(to: @escaping (PromiseKit.Result<ResultType>) -> Void) {
         race([cancelationPromise.promise, promise]).pipe(to: to)
     }
     public var result: PromiseKit.Result<ResultType>? { return promise.result }
-    
-    public enum Payload {
-        case parameters(_: Parameters?)
-        case httpBody(_: Data?)
-    }
 
     public let path: String
     public let httpMethod: HTTPMethod
     
-    public var requestPayload: Payload = .parameters(nil)
+    public var queryParams: Parameters? = nil
+    public var httpBody: Data?
+    
     public var encoding: ParameterEncoding?
     
-    public init(path: String, httpMethod: HTTPMethod) {
+    public init(path: String, httpMethod: HTTPMethod, apiServiceId: ApiServiceLocator.ApiServiceProducerId) {
         self.path = path
         self.httpMethod = httpMethod
+        self.apiServiceId = apiServiceId
     }
     
     public func cancel() {

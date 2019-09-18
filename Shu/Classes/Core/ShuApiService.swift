@@ -78,26 +78,16 @@ public class ShuApiService: ApiService {
             headers.merge(middleware.headersExtensionBlock?() ?? [:]) { _, new in new }
         }
         
-        let encoding = operation.encoding ?? URLEncoding.default
-        
         var dataRequest: DataRequest!
         
-        switch operation.requestPayload {
-        case .parameters(let parameters):
-            dataRequest = self.sessionManager
-                .request(preparedUrl,
-                         method: operation.httpMethod,
-                         parameters: parameters,
-                         encoding: encoding,
-                         headers: headers)
-        case .httpBody(let httpBody):
-            var urlRequest = URLRequest(url: URL(string: preparedUrl)!)
-            urlRequest.httpMethod = operation.httpMethod.rawValue
-            headers.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
-            urlRequest.httpBody = httpBody
-            
-            dataRequest = self.sessionManager.request(urlRequest)
-        }
+        var urlComps = URLComponents(string: preparedUrl)!
+        urlComps.queryItems = operation.queryParams?.map { URLQueryItem(name: $0.key, value: String(describing:$0.value)) }
+        var urlRequest = URLRequest(url: urlComps.url!)
+        urlRequest.httpMethod = operation.httpMethod.rawValue
+        headers.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
+        urlRequest.httpBody = operation.httpBody
+
+        dataRequest = self.sessionManager.request(urlRequest)
         
         #if DEBUG
         dataRequest = dataRequest.log()

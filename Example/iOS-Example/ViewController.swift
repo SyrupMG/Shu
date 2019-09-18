@@ -14,12 +14,24 @@ class Todo: Codable, ApiMappable {
     static var apiMapper: ApiMapper = JSONApiMapper()
     
     var id: Int = 0
-    var userId: Int = 0
-    var title: String = ""
-    var completed: Bool = false
+    var userId: Int? = 0
+    var title: String? = ""
+    var completed: Bool? = false
+    
+    init(id: Int, title: String, completed: Bool) {
+        self.id = id
+        self.title = title
+        self.completed = completed
+    }
 }
 
 class TodoResource: CRUDApiResource<Todo> {
+    convenience init() {
+        self.init(collectionPath: "/todos/")
+    }
+}
+
+class TodosResource: CRUDApiResource<[Todo]> {
     convenience init() {
         self.init(collectionPath: "/todos/")
     }
@@ -50,7 +62,7 @@ class ViewController: UIViewController {
         // Можно использовать для того, чтобы ВСЕГДА делать какое-то действие
         apiService.addMiddleware {
             $0.success {
-                if let todos = $0 as? [Todo] {
+                if $0 is [Todo] {
                     print("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
@@ -59,7 +71,7 @@ class ViewController: UIViewController {
                         🅰️🅰️🅰️
                     """)
                 }
-                if let todo = $0 as? Todo {
+                if $0 is Todo {
                     print("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
@@ -68,7 +80,6 @@ class ViewController: UIViewController {
                         🅰️🅰️🅰️
                     """)
                 }
-                type(of: $0)
             }
         }
         
@@ -83,10 +94,12 @@ class ViewController: UIViewController {
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
                     """)
+                    // Дополнительные параметры
+                    todosOperation.queryParams = ["sig":"foobar"]
                     return after(seconds: 5).asVoid()
                 }
                 
-                if let todoOperation = $0 as? Shu.Operation<Todo> {
+                if $0 is Shu.Operation<Todo> {
                     print("""
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
@@ -109,8 +122,9 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         let resource = TodoResource()
+        let multipleResource = TodosResource()
 
-        resource.list()
+        _ = resource.list()
             .then { todos  in
                 return resource.read(resourceId: "\(todos.first!.id)")
             }
@@ -118,9 +132,10 @@ class ViewController: UIViewController {
                 todo.title = "teta gamma delta"
                 return resource.update(resourceId: "\(todo.id)", object: todo)
             }
-        
-//        apiService.make(request: TodoGetRequest(id: 1))
-//            .done { print($0) }
+            .then { some -> Shu.Operation<[Todo]> in
+                let todos = (0...5).map { Todo(id: $0, title: "test \($0)", completed: false) }
+                return multipleResource.create(object: todos)
+        }
     }
 }
 
