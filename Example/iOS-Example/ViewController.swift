@@ -14,12 +14,24 @@ class Todo: Codable, ApiMappable {
     static var apiMapper: ApiMapper = JSONApiMapper()
     
     var id: Int = 0
-    var userId: Int = 0
-    var title: String = ""
-    var completed: Bool = false
+    var userId: Int? = 0
+    var title: String? = ""
+    var completed: Bool? = false
+    
+    init(id: Int, title: String, completed: Bool) {
+        self.id = id
+        self.title = title
+        self.completed = completed
+    }
 }
 
 class TodoResource: CRUDApiResource<Todo> {
+    convenience init() {
+        self.init(collectionPath: "/todos/")
+    }
+}
+
+class TodosResource: CRUDApiResource<[Todo]> {
     convenience init() {
         self.init(collectionPath: "/todos/")
     }
@@ -83,6 +95,8 @@ class ViewController: UIViewController {
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
                     """)
+                    // Дополнительные параметры
+                    todosOperation.queryParams = ["sig":"foobar"]
                     return after(seconds: 5).asVoid()
                 }
                 
@@ -109,6 +123,7 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         let resource = TodoResource()
+        let multipleResource = TodosResource()
 
         resource.list()
             .then { todos  in
@@ -118,6 +133,10 @@ class ViewController: UIViewController {
                 todo.title = "teta gamma delta"
                 return resource.update(resourceId: "\(todo.id)", object: todo)
             }
+            .then { some -> Shu.Operation<[Todo]> in
+                let todos = (0...5).map { Todo(id: $0, title: "test \($0)", completed: false) }
+                return multipleResource.create(object: todos)
+        }
         
 //        apiService.make(request: TodoGetRequest(id: 1))
 //            .done { print($0) }

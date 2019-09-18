@@ -24,6 +24,7 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
         return Operation<[ResourceModel]>(path: collectionPath, httpMethod: .get)
     }
     
+    /*
     private func uploadPayload(for object: ResourceModel) -> Operation<ResourceModel>.Payload {
         if let _ = object as? [Any] {
             guard let jsonData = ResourceModel.apiMapper.encodeToData(object) else { return .httpBody(nil) }
@@ -35,13 +36,19 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
             return .parameters(parameters)
         }
     }
+     */
+    
+    private func bodyPayload(for object: ResourceModel) -> Data? {
+        guard let jsonData = ResourceModel.apiMapper.encodeToData(object) else { return nil }
+        return jsonData
+    }
     
     /// POST
     public final func create(object: ResourceModel) -> Operation<ResourceModel> {
         let operation = Operation<ResourceModel>(path: collectionPath, httpMethod: .post)
         
         operation.encoding = JSONEncoding.default
-        operation.requestPayload = uploadPayload(for: object)
+        operation.httpBody = bodyPayload(for: object)
         
         return operation
     }
@@ -51,7 +58,7 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
         let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .put)
         
         operation.encoding = JSONEncoding.default
-        operation.requestPayload = uploadPayload(for: object)
+        operation.httpBody = bodyPayload(for: object)
         
         return operation
     }

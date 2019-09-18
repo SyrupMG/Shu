@@ -22,16 +22,13 @@ public class Operation<ResultType: ApiMappable>: Thenable {
         race([cancelationPromise.promise, promise]).pipe(to: to)
     }
     public var result: PromiseKit.Result<ResultType>? { return promise.result }
-    
-    public enum Payload {
-        case parameters(_: Parameters?)
-        case httpBody(_: Data?)
-    }
 
     public let path: String
     public let httpMethod: HTTPMethod
     
-    public var requestPayload: Payload = .parameters(nil)
+    public var queryParams: Parameters? = nil
+    public var httpBody: Data?
+    
     public var encoding: ParameterEncoding?
     
     public init(path: String, httpMethod: HTTPMethod) {
