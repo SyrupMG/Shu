@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 import PromiseKit
 
-public protocol ApiService {
+public protocol ApiService: AnyObject {
     typealias MiddlewareConfigBlock = (Middleware) -> Void
 
     init(baseUrl: String)
@@ -20,5 +20,5 @@ public protocol ApiService {
 }
 
 extension ApiService {
-    public func setAsMain() { ApiServiceLocator.setMain(self) }
+    public func setAsMain() { ApiServiceLocator.setMainProducer { [weak self] in return self } }
 }

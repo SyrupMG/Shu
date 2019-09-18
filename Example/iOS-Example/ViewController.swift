@@ -62,7 +62,7 @@ class ViewController: UIViewController {
         // Можно использовать для того, чтобы ВСЕГДА делать какое-то действие
         apiService.addMiddleware {
             $0.success {
-                if let todos = $0 as? [Todo] {
+                if $0 is [Todo] {
                     print("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
@@ -71,7 +71,7 @@ class ViewController: UIViewController {
                         🅰️🅰️🅰️
                     """)
                 }
-                if let todo = $0 as? Todo {
+                if $0 is Todo {
                     print("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
@@ -80,7 +80,6 @@ class ViewController: UIViewController {
                         🅰️🅰️🅰️
                     """)
                 }
-                type(of: $0)
             }
         }
         
@@ -100,7 +99,7 @@ class ViewController: UIViewController {
                     return after(seconds: 5).asVoid()
                 }
                 
-                if let todoOperation = $0 as? Shu.Operation<Todo> {
+                if $0 is Shu.Operation<Todo> {
                     print("""
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
@@ -125,7 +124,7 @@ class ViewController: UIViewController {
         let resource = TodoResource()
         let multipleResource = TodosResource()
 
-        resource.list()
+        _ = resource.list()
             .then { todos  in
                 return resource.read(resourceId: "\(todos.first!.id)")
             }
@@ -137,9 +136,6 @@ class ViewController: UIViewController {
                 let todos = (0...5).map { Todo(id: $0, title: "test \($0)", completed: false) }
                 return multipleResource.create(object: todos)
         }
-        
-//        apiService.make(request: TodoGetRequest(id: 1))
-//            .done { print($0) }
     }
 }
 
