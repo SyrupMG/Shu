@@ -1,22 +1,24 @@
 PODS:
-  - Alamofire (4.7.3)
+  - Alamofire (4.9.0)
   - AlamofireActivityLogger (2.5.0):
     - Alamofire (~> 4.7)
-  - PromiseKit (6.5.2):
-    - PromiseKit/CorePromise (= 6.5.2)
-    - PromiseKit/Foundation (= 6.5.2)
-    - PromiseKit/UIKit (= 6.5.2)
-  - PromiseKit/Alamofire (6.5.2):
+  - Astaroth (0.3.0)
+  - PromiseKit (6.11.0):
+    - PromiseKit/CorePromise (= 6.11.0)
+    - PromiseKit/Foundation (= 6.11.0)
+    - PromiseKit/UIKit (= 6.11.0)
+  - PromiseKit/Alamofire (6.11.0):
     - Alamofire (~> 4.0)
     - PromiseKit/CorePromise
-  - PromiseKit/CorePromise (6.5.2)
-  - PromiseKit/Foundation (6.5.2):
+  - PromiseKit/CorePromise (6.11.0)
+  - PromiseKit/Foundation (6.11.0):
     - PromiseKit/CorePromise
-  - PromiseKit/UIKit (6.5.2):
+  - PromiseKit/UIKit (6.11.0):
     - PromiseKit/CorePromise
-  - Shu (1.1.1):
+  - Shu (1.3.0):
     - Alamofire
     - AlamofireActivityLogger
+    - Astaroth
     - PromiseKit
     - PromiseKit/Alamofire
 
@@ -27,6 +29,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - AlamofireActivityLogger
+    - Astaroth
     - PromiseKit
 
 EXTERNAL SOURCES:
@@ -34,10 +37,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  Alamofire: afc3e7c6db61476cb45cdd23fed06bad03bbc321
   AlamofireActivityLogger: 4dbb52cbd9a26590775df5d4d0284fa81f9b9b5b
-  PromiseKit: 27c1601bfb73405871b805bcb8cf7e55c4dad3db
-  Shu: c8432d76f06b29ca80e29888dbdb7565e30e15f5
+  Astaroth: c6a502ec90814ef45a5ea54af430e4aa0c229706
+  PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
+  Shu: bf843395043ed3d9ed50f39e7ff0ed5bf6219df2
 
 PODFILE CHECKSUM: bd86c749b43d0349cb56ce5f18e11e7c69112375
 

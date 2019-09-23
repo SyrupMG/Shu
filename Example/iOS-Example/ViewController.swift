@@ -9,6 +9,7 @@
 import UIKit
 import Shu
 import PromiseKit
+import Astaroth
 
 class Todo: Codable, ApiMappable {
     static var apiMapper: ApiMapper = JSONApiMapper()
@@ -63,7 +64,7 @@ class ViewController: UIViewController {
         apiService.addMiddleware {
             $0.success {
                 if $0 is [Todo] {
-                    print("""
+                    Log.i("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
                         Получили [TODO]
@@ -72,7 +73,7 @@ class ViewController: UIViewController {
                     """)
                 }
                 if $0 is Todo {
-                    print("""
+                    Log.i("""
                         🅰️🅰️🅰️
                         🅰️🅰️🅰️
                         Получили TODO
@@ -86,7 +87,7 @@ class ViewController: UIViewController {
         apiService.addMiddleware {
             $0.requestBarier {
                 if let todosOperation = $0 as? Shu.Operation<[Todo]> {
-                    print("""
+                    Log.i("""
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
                         Операция будет заблокирована на 5 секунд
@@ -100,7 +101,7 @@ class ViewController: UIViewController {
                 }
                 
                 if $0 is Shu.Operation<Todo> {
-                    print("""
+                    Log.i("""
                         🅱️🅱️🅱️
                         🅱️🅱️🅱️
                         Операция будет заблокирована на 7 секунд
