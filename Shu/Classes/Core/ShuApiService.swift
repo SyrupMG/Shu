@@ -177,11 +177,11 @@ private class AstarothPrinter: Printer {
         switch phase {
         case .request:
             requestString = string
-            Log.d(string)
+            Log.d(Network, string)
         case .response(let success):
             let string = "\(requestString)\n\(string)"
-            if success { Log.i(string) }
-            else { Log.e(string) }
+            if success { Log.i(Network, string) }
+            else { Log.e(Network, string) }
         }
     }
 }

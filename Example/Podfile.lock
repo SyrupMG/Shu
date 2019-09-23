@@ -15,7 +15,7 @@ PODS:
     - PromiseKit/CorePromise
   - PromiseKit/UIKit (6.11.0):
     - PromiseKit/CorePromise
-  - Shu (1.3.0):
+  - Shu (1.3.1):
     - Alamofire
     - AlamofireActivityLogger
     - Astaroth
@@ -41,7 +41,7 @@ SPEC CHECKSUMS:
   AlamofireActivityLogger: 4dbb52cbd9a26590775df5d4d0284fa81f9b9b5b
   Astaroth: c6a502ec90814ef45a5ea54af430e4aa0c229706
   PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
-  Shu: bf843395043ed3d9ed50f39e7ff0ed5bf6219df2
+  Shu: 38868d02ac008603b88c46ade3f0a7909d1b1e23
 
 PODFILE CHECKSUM: bd86c749b43d0349cb56ce5f18e11e7c69112375
 
