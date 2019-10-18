@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Shu'
-  s.version          = '1.2.0'
+  s.version          = '1.3.2'
   s.summary          = 'ApiService'
 
 # This description is used to generate tags and improve search results.
@@ -34,5 +34,6 @@ Pod::Spec.new do |s|
   s.dependency 'AlamofireActivityLogger'
   s.dependency 'PromiseKit/Alamofire'
   s.dependency 'PromiseKit'
+  s.dependency 'Astaroth'
   
 end

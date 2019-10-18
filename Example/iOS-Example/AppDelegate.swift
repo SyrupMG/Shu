@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Astaroth
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        Log.addLoggers(ConsoleLogger(config: LoggerConfig(format: "\n$place @ ($context)\n$message\n")))
         // Override point for customization after application launch.
         return true
     }
