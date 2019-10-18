@@ -67,7 +67,8 @@ public class ShuApiService: ApiService {
             $0.split(separator: "/").map { String($0) }
         }.joined(separator: "/")
 
-        return basePart + trailingParts
+        let needTrailingSlash = stringParts.last?.hasSuffix("/") ?? false
+        return basePart + trailingParts + (needTrailingSlash ? "/" : "")
     }
 
     private func make<ResultType>(operation: Operation<ResultType>) -> DataRequest {
