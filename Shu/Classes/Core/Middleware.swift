@@ -10,7 +10,12 @@ import Alamofire
 import PromiseKit
 
 public protocol Middleware {
-    typealias HeadersExtensionBlock = () -> HTTPHeaders
+    /**
+     Следует ожидать, что на вход в блок попадает **Operation<T: ApiMappable>.Type**
+     
+     Это можно использовать для того чтобы использовать разные заголовке в зависимости от операции
+     */
+    typealias HeadersExtensionBlock = (Any) -> HTTPHeaders
     func headers(_ headersExtensionBlock: @escaping HeadersExtensionBlock)
     
     /**

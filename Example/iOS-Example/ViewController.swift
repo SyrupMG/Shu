@@ -46,16 +46,28 @@ class ViewController: UIViewController {
         apiService.setAsMain()
         // Ожидается, что добавится заголовок X-Foo со значение "Bar"
         apiService.addMiddleware {
-            $0.headers { return ["X-Foo": "Bar"] }
+            $0.headers { _ in return ["X-Foo": "Bar"] }
         }
         // Ожидается, что добавится заголовок X-Bar со значение "Some"
         apiService.addMiddleware {
-            $0.headers { return ["X-Bar":"Some"] }
+            $0.headers { _ in return ["X-Bar":"Some"] }
         }
         // Ожидается, что заголовок "X-Foo" будет заменен на новый со значение "Bar1",
         // т.к. этот мидлвар добавлен позже и будет обработан с большим приориететом
         apiService.addMiddleware {
-            $0.headers { return ["X-Foo": "Bar1"] }
+            $0.headers { _ in return ["X-Foo": "Bar1"] }
+        }
+        
+        // Ожидается, что если операция возвращает [Todo], добавим к операции заголовок `X-TODO-ARR: Yes!`
+        // в противном случае `X-TODO-ARR: No`
+        apiService.addMiddleware {
+            $0.headers { operationType -> HTTPHeaders in
+                if operationType is Shu.Operation<[Todo]>.Type {
+                    return ["X-TODO-ARR": "Yes!"]
+                } else {
+                    return ["X-TODO-ARR": "No"]
+                }
+            }
         }
         
         

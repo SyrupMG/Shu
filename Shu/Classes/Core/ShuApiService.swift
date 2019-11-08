@@ -76,7 +76,7 @@ public class ShuApiService: ApiService {
 
         var headers = HTTPHeaders()
         middlewares.forEach { middleware in
-            headers.merge(middleware.headersExtensionBlock?() ?? [:]) { _, new in new }
+            headers.merge(middleware.headersExtensionBlock?(Operation<ResultType>.self) ?? [:]) { _, new in new }
         }
 
         var dataRequest: DataRequest!
