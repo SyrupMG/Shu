@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Shu'
-  s.version          = '1.4.1'
+  s.version          = '1.5.0'
   s.summary          = 'ApiService'
 
 # This description is used to generate tags and improve search results.

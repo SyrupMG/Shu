@@ -92,6 +92,20 @@ public class ShuApiService: ApiService {
         urlRequest.httpBody = operation.httpBody
 
         dataRequest = self.sessionManager.request(urlRequest)
+        // TODO: - это хук вокруг ляжки на случай, если в заголовках попадается Basic авторизация. Ее надо проксировать в авторизацию URLSession
+        // т.к. иногда она работает более корректно. По хорошему, надо наружу вытащить возможность настраивать авторизацию
+        if let authorization = headers["Authorization"],
+            authorization.hasPrefix("Basic"),
+            let authToken = authorization.components(separatedBy: " ").last,
+            let decodedTokenData = Data(base64Encoded: authToken),
+            let decodedToken = String(data: decodedTokenData, encoding: .utf8) {
+            let decodedTokenParts = decodedToken.components(separatedBy: ":")
+            if decodedTokenParts.count == 2,
+                let username = decodedTokenParts.first,
+                let password = decodedTokenParts.last {
+                dataRequest = dataRequest.authenticate(user: username, password: password)
+            }
+        }
 
         dataRequest = dataRequest.log(options: [.jsonPrettyPrint], printer: AstarothPrinter())
 

@@ -19,7 +19,9 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
     
     // GET on resource
     public final func read(resourceId: String) -> Operation<ResourceModel> {
-        return Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .get, apiServiceId: apiServiceId)
+        var path = collectionPath
+        if !resourceId.isEmpty { path = path + "/" + resourceId }
+        return Operation<ResourceModel>(path: path, httpMethod: .get, apiServiceId: apiServiceId)
     }
     
     /// GET on collection
@@ -44,7 +46,9 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
     
     /// PUT on resource
     public final func update(resourceId: String, object: ResourceModel) -> Operation<ResourceModel> {
-        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .put, apiServiceId: apiServiceId)
+        var path = collectionPath
+        if !resourceId.isEmpty { path = path + "/" + resourceId }
+        let operation = Operation<ResourceModel>(path: path, httpMethod: .put, apiServiceId: apiServiceId)
         
         operation.encoding = JSONEncoding.default
         operation.httpBody = bodyPayload(for: object)
@@ -54,7 +58,9 @@ open class CRUDApiResource<ResourceModel: ApiMappable> {
     
     /// DELETE on resource
     public final func delete(resourceId: String) -> Operation<ResourceModel> {
-        let operation = Operation<ResourceModel>(path: "\(collectionPath)/\(resourceId)", httpMethod: .delete, apiServiceId: apiServiceId)
+        var path = collectionPath
+        if !resourceId.isEmpty { path = path + "/" + resourceId }
+        let operation = Operation<ResourceModel>(path: path, httpMethod: .delete, apiServiceId: apiServiceId)
         return operation
     }
 }
