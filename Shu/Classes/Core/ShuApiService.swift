@@ -42,6 +42,9 @@ public class ShuApiService: ApiService {
     private let baseUrl: String
     private let sessionManager: SessionManager
     private var middlewares = [BasicMiddleware]()
+    private var queue: DispatchQueue {
+        return sessionManager.session.delegateQueue.underlyingQueue ?? DispatchQueue.global(qos: .utility)
+    }
 
     // MARK: -init
 
@@ -89,6 +92,20 @@ public class ShuApiService: ApiService {
         urlRequest.httpBody = operation.httpBody
 
         dataRequest = self.sessionManager.request(urlRequest)
+        // TODO: - это хук вокруг ляжки на случай, если в заголовках попадается Basic авторизация. Ее надо проксировать в авторизацию URLSession
+        // т.к. иногда она работает более корректно. По хорошему, надо наружу вытащить возможность настраивать авторизацию
+        if let authorization = headers["Authorization"],
+            authorization.hasPrefix("Basic"),
+            let authToken = authorization.components(separatedBy: " ").last,
+            let decodedTokenData = Data(base64Encoded: authToken),
+            let decodedToken = String(data: decodedTokenData, encoding: .utf8) {
+            let decodedTokenParts = decodedToken.components(separatedBy: ":")
+            if decodedTokenParts.count == 2,
+                let username = decodedTokenParts.first,
+                let password = decodedTokenParts.last {
+                dataRequest = dataRequest.authenticate(user: username, password: password)
+            }
+        }
 
         dataRequest = dataRequest.log(options: [.jsonPrettyPrint], printer: AstarothPrinter())
 
@@ -120,7 +137,7 @@ public class ShuApiService: ApiService {
 
         return Promise(resolver: { (resolver) in
             dataRequest
-                .response(completionHandler: { (response) in
+                .response(queue: queue, completionHandler: { (response) in
                     resolver.fulfill(response)
                 })
         })
@@ -128,18 +145,18 @@ public class ShuApiService: ApiService {
 
     public func make<ResultType>(operation: Operation<ResultType>) -> Promise<ResultType> {
         let barierBlocks = middlewares.compactMap { $0.requestBarierBlock }
-        return when(fulfilled: barierBlocks.map { $0(operation) }).then { _ -> Promise<ResultType> in
+        return when(fulfilled: barierBlocks.map { $0(operation) }).then(on: queue) { _ -> Promise<ResultType> in
             let dataRequest: DataRequest = self.make(operation: operation)
 
             return dataRequest
-                .response(.promise)
-                .map { (request, response, data) -> ResultType in
+                .response(.promise, queue: self.queue)
+                .map(on: self.queue) { (request, response, data) -> ResultType in
                     let res: ResultType = try ResultType.apiMapper.decode(data)
                     self.middlewares.forEach { $0.successBlock?(res) }
                     return res
-                }
-                .recover { error throws -> Promise<ResultType> in
-                    return self.handle(error: error, for: operation) as Promise<ResultType>
+            }
+            .recover(on: self.queue) { error throws -> Promise<ResultType> in
+                return self.handle(error: error, for: operation) as Promise<ResultType>
             }
         }
 
@@ -156,11 +173,11 @@ public class ShuApiService: ApiService {
 
             return nextRecoverBlock
                 // if recover block resolves, resolve promise chain with Void
-                .then { value -> Promise<Void> in
+                .then(on: queue) { value -> Promise<Void> in
                     return Promise.value(())
                 }
                 // If recover block raises error, try next recover block
-                .recover { error -> Promise<Void> in
+                .recover(on: queue) { error -> Promise<Void> in
                     return next()
                 }
         }
