@@ -42,6 +42,12 @@ public class Operation<ResultType: ApiMappable>: Thenable {
         self.apiServiceId = apiServiceId
     }
     
+    deinit {
+        if cancelationPromise.promise.isPending {
+            cancelationPromise.resolver.reject(PMKError.cancelled)
+        }
+    }
+    
     public func cancel() {
         // TODO: - дополнительно надо отменять сетевую операцию, иначе как-то бессмысленно
         cancelationPromise.resolver.reject(PMKError.cancelled)
