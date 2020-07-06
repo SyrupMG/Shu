@@ -86,6 +86,8 @@ public class ShuApiService: ApiService {
 
         var urlComps = URLComponents(string: preparedUrl)!
         urlComps.queryItems = operation.queryParams?.map { URLQueryItem(name: $0.key, value: String(describing:$0.value)) }
+        urlComps.percentEncodedQuery = urlComps.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
+        
         var urlRequest = URLRequest(url: urlComps.url!)
         urlRequest.httpMethod = operation.httpMethod.rawValue
         headers.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
