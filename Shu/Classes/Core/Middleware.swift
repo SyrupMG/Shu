@@ -17,7 +17,7 @@ public protocol Middleware {
      */
     typealias HeadersExtensionBlock = (Any) -> HTTPHeaders
     func headers(_ headersExtensionBlock: @escaping HeadersExtensionBlock)
-    
+
     /**
      Следует ожидать, что на вход в блок попадет **Operation<T: ApiMappable>**
      
@@ -26,10 +26,10 @@ public protocol Middleware {
     */
     typealias RequestBarierBlock = (Any) -> Promise<Void>
     func requestBarier(_ requestBarierBlock: @escaping RequestBarierBlock)
-    
-    typealias ResponseValidationBlock = (_: Int, _ data: Data?) throws -> Void
+
+    typealias ResponseValidationBlock = (_: Int, _ headers: [AnyHashable: Any], _ data: Data?) throws -> Void
     func validateResponse(_ responseValidationBlock: @escaping ResponseValidationBlock)
-    
+
     /**
      Следует ожидать, что на вход в блок в месте Any попадет **Operation<T: ApiMappable>**
      
@@ -37,7 +37,7 @@ public protocol Middleware {
      */
     typealias RecoverBlock = (Error, Any) -> Promise<Void>
     func recover(_ recoverBlock: @escaping RecoverBlock)
-    
+
     /**
      Следует ожидать, что на вход попадет **(T: ApiMappable)**
      

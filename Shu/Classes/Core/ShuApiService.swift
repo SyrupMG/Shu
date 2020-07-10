@@ -118,7 +118,7 @@ public class ShuApiService: ApiService {
                 guard let validate = middleware.responseValidationBlock else { return nil }
                 do {
                     // try to validate
-                    try validate(response.statusCode, data)
+                    try validate(response.statusCode, response.allHeaderFields, data)
                     return nil
                 } catch {
                     // if error throwed, return it, so we can fail the request
