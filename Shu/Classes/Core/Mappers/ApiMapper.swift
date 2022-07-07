@@ -6,11 +6,8 @@
 //
 
 import Foundation
-import Alamofire
-
-struct ApiMapperError: Error {}
 
 public protocol ApiMapper {
-    func decode<T: ApiMappable>(_ data: Data) throws -> T
-    func encodeToData<T: ApiMappable>(_ object: T) -> Data?
+    func decode<T: Decodable>(_ data: Data) throws -> T
+    func encodeToData<T: Encodable>(_ object: T) -> Data?
 }

@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Shu'
-  s.version          = '1.5.3'
+  s.version          = '2.0.0'
   s.summary          = 'ApiService'
 
 # This description is used to generate tags and improve search results.
@@ -24,16 +24,26 @@ Pod::Spec.new do |s|
   s.author           = { 'abesmon' => 'abesmon@gmail.com' }
   s.source           = { :git => 'https://github.com/SyrupMG/Shu.git', :tag => s.version.to_s }
 
-  s.ios.deployment_target = '8.0'
-  s.tvos.deployment_target = '9.0'
-  s.swift_version = '4.2'
-
-  s.source_files = 'Shu/**/*.{swift}'
-
-  s.dependency 'Alamofire'
-  s.dependency 'AlamofireActivityLogger'
-  s.dependency 'PromiseKit/Alamofire'
-  s.dependency 'PromiseKit'
-  s.dependency 'Astaroth'
+  s.ios.deployment_target = '10.0'
+  s.tvos.deployment_target = '10.0'
+  s.swift_version = '5.3'
+  s.default_subspec = "Core"
+  
+  s.subspec "Core" do |ss|
+    ss.source_files = 'Shu/Classes/Core/**/*.{swift}'
+    s.dependency 'Alamofire', "~> 5.4"
+    s.dependency 'PromiseKit', "~> 6.8"
+  end
+  
+  s.subspec "CRUD" do |ss|
+    ss.source_files = 'Shu/Classes/CRUD/**/*.{swift}'
+    ss.dependency 'Shu/Core'
+  end
+  
+  s.subspec "SwiftyBeaverLog" do |ss|
+    ss.source_files = 'Shu/Classes/SwiftyBeaverLog/**/*.{swift}'
+    ss.dependency 'Shu/Core'
+    ss.dependency 'SwiftyBeaver', "~> 1.9"
+  end
   
 end

@@ -1,48 +1,54 @@
 PODS:
-  - Alamofire (4.9.0)
-  - AlamofireActivityLogger (2.5.0):
-    - Alamofire (~> 4.7)
-  - Astaroth (0.3.0)
+  - Alamofire (5.6.1)
   - PromiseKit (6.11.0):
     - PromiseKit/CorePromise (= 6.11.0)
     - PromiseKit/Foundation (= 6.11.0)
     - PromiseKit/UIKit (= 6.11.0)
-  - PromiseKit/Alamofire (6.11.0):
-    - Alamofire (~> 4.0)
-    - PromiseKit/CorePromise
   - PromiseKit/CorePromise (6.11.0)
   - PromiseKit/Foundation (6.11.0):
     - PromiseKit/CorePromise
   - PromiseKit/UIKit (6.11.0):
     - PromiseKit/CorePromise
-  - Shu (1.5.2):
-    - Alamofire
-    - AlamofireActivityLogger
-    - Astaroth
-    - PromiseKit
-    - PromiseKit/Alamofire
+  - Shu (2.0.0):
+    - Alamofire (~> 5.4)
+    - PromiseKit (~> 6.8)
+    - Shu/Core (= 2.0.0)
+  - Shu/Core (2.0.0):
+    - Alamofire (~> 5.4)
+    - PromiseKit (~> 6.8)
+  - Shu/CRUD (2.0.0):
+    - Alamofire (~> 5.4)
+    - PromiseKit (~> 6.8)
+    - Shu/Core
+  - Shu/SwiftyBeaverLog (2.0.0):
+    - Alamofire (~> 5.4)
+    - PromiseKit (~> 6.8)
+    - Shu/Core
+    - SwiftyBeaver (~> 1.9)
+  - SwiftyBeaver (1.9.5)
 
 DEPENDENCIES:
   - Shu (from `../`)
+  - Shu/CRUD (from `../`)
+  - Shu/SwiftyBeaverLog (from `../`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - Alamofire
-    - AlamofireActivityLogger
-    - Astaroth
     - PromiseKit
+  trunk:
+    - Alamofire
+    - SwiftyBeaver
 
 EXTERNAL SOURCES:
   Shu:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Alamofire: afc3e7c6db61476cb45cdd23fed06bad03bbc321
-  AlamofireActivityLogger: 4dbb52cbd9a26590775df5d4d0284fa81f9b9b5b
-  Astaroth: c6a502ec90814ef45a5ea54af430e4aa0c229706
+  Alamofire: 87bd8c952f9a4454320fce00d9cc3de57bcadaf5
   PromiseKit: e4863d06976e7dee5e41c04fc7371c16b3600292
-  Shu: 12e005af0efbf74723c72057c16751f0391ea586
+  Shu: 82833f4747aa1654e8d4e8b1216ebe3d412532e2
+  SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
 
-PODFILE CHECKSUM: bd86c749b43d0349cb56ce5f18e11e7c69112375
+PODFILE CHECKSUM: acfaac1c8c0b6adbcc25cc94392661c906c1d1fa
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.11.3

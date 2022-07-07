@@ -10,46 +10,25 @@ import Foundation
 import Alamofire
 import PromiseKit
 
-public typealias HTTPMethod = Alamofire.HTTPMethod
+public protocol AnyOperation {
+    var baseURL: String { get }
+    var path: String { get }
+    
+    var trailingSlash: Bool { get }
+    var queryParams: [String: String?]? { get }
+    var httpBody: Data? { get }
+    var headers: [String: String]? { get }
+    var httpMethod: String? { get }
+}
 
-public class Operation<ResultType: ApiMappable>: Thenable {
-    enum Error: Swift.Error {
-        case apiServiceNotFound
-    }
+public protocol Operation: AnyOperation {
+    associatedtype ResultType
     
-    // MARK: - Thenable
-    
-    private lazy var cancelationPromise = Promise<ResultType>.pending()
-    private lazy var promise = ApiServiceLocator.makeService(withIdentifier: apiServiceId)?.make(operation: self) ?? Promise(error: Error.apiServiceNotFound)
-    private let apiServiceId: ApiServiceLocator.ApiServiceProducerId
-    
-    public func pipe(to: @escaping (PromiseKit.Result<ResultType>) -> Void) {
-        race([cancelationPromise.promise, promise]).pipe(to: to)
-    }
-    public var result: PromiseKit.Result<ResultType>? { return promise.result }
+    func proceed(data: Data) throws -> ResultType
+}
 
-    public let path: String
-    public let httpMethod: HTTPMethod
-    
-    public var queryParams: Parameters? = nil
-    public var httpBody: Data?
-    
-    public var encoding: ParameterEncoding?
-    
-    public init(path: String, httpMethod: HTTPMethod, apiServiceId: ApiServiceLocator.ApiServiceProducerId) {
-        self.path = path
-        self.httpMethod = httpMethod
-        self.apiServiceId = apiServiceId
-    }
-    
-    deinit {
-        if cancelationPromise.promise.isPending {
-            cancelationPromise.resolver.reject(PMKError.cancelled)
-        }
-    }
-    
-    public func cancel() {
-        // TODO: - дополнительно надо отменять сетевую операцию, иначе как-то бессмысленно
-        cancelationPromise.resolver.reject(PMKError.cancelled)
+public extension Operation {
+    func callAsFunction(on apiService: ApiService) -> Promise<ResultType> {
+        apiService.make(self)
     }
 }

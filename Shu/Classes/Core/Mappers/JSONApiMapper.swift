@@ -11,12 +11,12 @@ public class JSONApiMapper: ApiMapper {
     public init() {}
 
     private let decoder = JSONDecoder()
-    public func decode<T>(_ data: Data) throws -> T where T : ApiMappable {
+    public func decode<T: Decodable>(_ data: Data) throws -> T {
         return try decoder.decode(T.self, from: data)
     }
     
     private let jsonEncoder = JSONEncoder()
-    public func encodeToData<T>(_ object: T) -> Data? where T : ApiMappable {
+    public func encodeToData<T: Encodable>(_ object: T) -> Data? {
         return try? jsonEncoder.encode(object)
     }
 }
