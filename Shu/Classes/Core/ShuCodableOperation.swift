@@ -30,7 +30,7 @@ public struct ShuCodableOperation<ResultType: Codable>: Operation {
         self.path = path
         self.httpMethod = httpMethod
         self.decoder = decoder
-        self.defaultProceedData = nil
+        self.defaultProceedData = defaultProceedData
     }
     
     public func proceed(data: Data?) throws -> ResultType {
