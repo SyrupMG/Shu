@@ -14,7 +14,6 @@ public protocol AnyOperation {
     var baseURL: String { get }
     var path: String { get }
     
-    var trailingSlash: Bool { get }
     var queryParams: [String: String?]? { get }
     var httpBody: Data? { get }
     var headers: [String: String]? { get }
@@ -24,7 +23,7 @@ public protocol AnyOperation {
 public protocol Operation: AnyOperation {
     associatedtype ResultType
     
-    func proceed(data: Data) throws -> ResultType
+    func proceed(data: Data?) throws -> ResultType
 }
 
 public extension Operation {

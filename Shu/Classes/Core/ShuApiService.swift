@@ -60,7 +60,6 @@ public class ShuApiService: ApiService {
     private func make<OP: Operation>(_ operation: OP) -> DataRequest {
         var urlComps = URLComponents(string: operation.baseURL)!
         urlComps.path = operation.path
-        if operation.trailingSlash, !urlComps.path.hasSuffix("/") { urlComps.path += "/" }
         
         urlComps.queryItems = operation.queryParams?.map { URLQueryItem(name: $0.0, value: $0.1) }
         urlComps.percentEncodedQuery = urlComps.percentEncodedQuery?.replacingOccurrences(of: "+", with: "%2B")
@@ -134,7 +133,6 @@ public class ShuApiService: ApiService {
         return when(fulfilled: barierBlocks.map { $0(operation, OP.ResultType.self) })
             .then(on: queue) { _ -> Promise<OP.ResultType> in
                 return self.makeRaw(operation)
-                    .compactMap(on: self.queue) { $0 }
                     .map(on: self.queue) { data -> OP.ResultType in
                         let res = try operation.proceed(data: data)
                         self.middlewares.forEach { $0.successBlock?(res, operation, OP.ResultType.self) }

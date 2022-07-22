@@ -24,12 +24,12 @@ open class CRUDApiResource<ResourceModel: Codable> {
         var path = resourcePath
         if path.hasSuffix("/") { path.removeLast() }
         if !resourceId.isEmpty { path = path + "/" + resourceId }
-        return ShuCodableOperation(baseURL: baseURL, path: path, httpMethod: HTTPMethod.get.rawValue, apiMapper: apiMapper)
+        return ShuCodableOperation(baseURL: baseURL, path: path, httpMethod: HTTPMethod.get.rawValue, decoder: apiMapper)
     }
     
     /// GET on collection
     public final func list() -> ShuCodableOperation<[ResourceModel]> {
-        return ShuCodableOperation(baseURL: baseURL, path: resourcePath, httpMethod: HTTPMethod.get.rawValue, apiMapper: apiMapper)
+        return ShuCodableOperation(baseURL: baseURL, path: resourcePath, httpMethod: HTTPMethod.get.rawValue, decoder: apiMapper)
     }
     
     private func bodyPayload(for object: ResourceModel) -> Data? {
@@ -42,7 +42,7 @@ open class CRUDApiResource<ResourceModel: Codable> {
         var operation = ShuCodableOperation<ResourceModel>(baseURL: baseURL,
                                                            path: resourcePath,
                                                            httpMethod: HTTPMethod.post.rawValue,
-                                                           apiMapper: apiMapper)
+                                                           decoder: apiMapper)
         operation.httpBody = bodyPayload(for: object)
         return operation
     }
@@ -55,7 +55,7 @@ open class CRUDApiResource<ResourceModel: Codable> {
         var operation = ShuCodableOperation<ResourceModel>(baseURL: baseURL,
                                                            path: path,
                                                            httpMethod: HTTPMethod.put.rawValue,
-                                                           apiMapper: apiMapper)
+                                                           decoder: apiMapper)
         operation.httpBody = bodyPayload(for: object)
         return operation
     }
@@ -65,6 +65,6 @@ open class CRUDApiResource<ResourceModel: Codable> {
         var path = resourcePath
         if path.hasSuffix("/") { path.removeLast() }
         if !resourceId.isEmpty { path = path + "/" + resourceId }
-        return ShuCodableOperation(baseURL: baseURL, path: resourcePath, httpMethod: HTTPMethod.delete.rawValue, apiMapper: apiMapper)
+        return ShuCodableOperation(baseURL: baseURL, path: resourcePath, httpMethod: HTTPMethod.delete.rawValue, decoder: apiMapper)
     }
 }

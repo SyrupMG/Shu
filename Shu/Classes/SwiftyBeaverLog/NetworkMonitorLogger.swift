@@ -15,7 +15,7 @@ extension Request {
         \(description)
         \(request?.allHTTPHeaderFields ?? [:])
         ===Request Body===
-        \(request?.httpBody.flatMap { String.init(data: $0, encoding: .utf8) } ?? "<EMPTY BODY>")
+        \(request?.httpBody?.prettyJsonOrDefault ?? "<EMPTY BODY>")
         ===Request Body END===
         """
     }
@@ -52,7 +52,7 @@ public class NetworkMonitorLogger: EventMonitor {
             """
             \(request._logDescription)
             ===Response Body===
-            \(log.debug(response.data.flatMap { String(data: $0, encoding: .utf8) } ?? "<NO RESPONSE>"))
+            \(log.debug(response.data?.prettyJsonOrDefault ?? "<NO RESPONSE>"))
             ===Response Body END===
             """,
             context: "✅ response"
@@ -64,10 +64,24 @@ public class NetworkMonitorLogger: EventMonitor {
             """
             \(request._logDescription)
             ===Response Body===
-            \(response.data.flatMap { String(data: $0, encoding: .utf8) } ?? "<NO RESPONSE>")
+            \(response.data?.prettyJsonOrDefault ?? "<NO RESPONSE>")
             ===Response Body END===
             """,
             context: "✅ response"
         )
+    }
+}
+
+extension Data {
+    var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
+        guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
+              let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
+              let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
+
+        return prettyPrintedString
+    }
+    
+    var prettyJsonOrDefault: String? {
+        (prettyPrintedJSONString as String?) ?? String(data: self, encoding: .utf8)
     }
 }
