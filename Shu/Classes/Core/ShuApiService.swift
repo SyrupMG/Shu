@@ -72,6 +72,7 @@ public class ShuApiService: ApiService {
         middlewares.forEach { middleware in
             headers.merge(middleware.headersExtensionBlock?(operation, OP.ResultType.self) ?? [:]) { _, new in new }
         }
+        headers.merge(operation.headers ?? [:]) { _, new in new }
         headers.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
 
         let dataRequest = self.session.request(urlRequest)

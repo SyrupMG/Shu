@@ -1,4 +1,4 @@
-# Shu
+![Shu banner logo](Resources/Banner.png "Shu")
 
 [![CI Status](https://img.shields.io/travis/abesmon/Shu.svg?style=flat)](https://travis-ci.org/abesmon/Shu)
 [![Version](https://img.shields.io/cocoapods/v/Shu.svg?style=flat)](https://cocoapods.org/pods/Shu)
@@ -20,9 +20,10 @@ it, simply add the following line to your Podfile:
 pod 'Shu'
 ```
 
-## Author
+## Authors
 
 abesmon, abesmon@gmail.com
+horovodovodo4ka, xbitstream@gmail.com
 
 ## License
 

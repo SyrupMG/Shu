@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Shu'
-  s.version          = '2.1.1'
+  s.version          = '2.1.2'
   s.summary          = 'ApiService'
 
 # This description is used to generate tags and improve search results.
@@ -21,7 +21,10 @@ Pod::Spec.new do |s|
 
   s.homepage         = 'https://github.com/SyrupMG/Shu'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'abesmon' => 'abesmon@gmail.com' }
+  s.author           = {
+      'abesmon' => 'abesmon@gmail.com',
+      'horovodovodo4ka' => 'xbitstream@gmail.com'
+  }
   s.source           = { :git => 'https://github.com/SyrupMG/Shu.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '10.0'
