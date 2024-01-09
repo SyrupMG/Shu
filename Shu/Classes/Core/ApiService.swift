@@ -7,13 +7,12 @@
 
 import Foundation
 import Alamofire
-import PromiseKit
 
 public protocol ApiService: AnyObject {
     typealias MiddlewareConfigBlock = (Middleware) -> Void
 
-    func make<OP: Operation>(_ operation: OP) -> Promise<OP.ResultType>
-    func makeRaw<OP: Operation>(_ operation: OP) -> Promise<Data?>
-    
+    func make<OP: Operation>(_ operation: OP) async throws -> OP.ResultType
+    func makeRaw<OP: Operation>(_ operation: OP) async throws -> Data?
+
     func addMiddleware(_ middlewareConfigBlock: MiddlewareConfigBlock)
 }

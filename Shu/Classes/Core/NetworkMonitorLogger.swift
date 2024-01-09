@@ -7,7 +7,6 @@
 
 import Foundation
 import Alamofire
-import SwiftyBeaver
 
 extension Request {
     var _logDescription: String {
@@ -21,38 +20,43 @@ extension Request {
     }
 }
 
-public class NetworkMonitorLogger: EventMonitor {
-    private let log = SwiftyBeaver.self
-    public var queue: DispatchQueue = DispatchQueue(label: "com.shu.networkmonitorlogger")
-    
-    public init() {  }
-    
+public protocol Logger {
+    func log(_ message: @autoclosure () -> Any, context: Any?)
+}
+
+public struct GenericNetworkMonitorLogger: EventMonitor {
+    public let logger: Logger
+
+    public init(logger: Logger) {
+        self.logger = logger
+    }
+
     public func requestDidCancel(_ request: Request) {
-        log.debug(request._logDescription, context: "⛔️ cancel")
+        logger.log(request._logDescription, context: "⛔️ cancel")
     }
     
     public func requestDidFinish(_ request: Request) {
-        log.debug(request._logDescription, context: "🏁 finish")
+        logger.log(request._logDescription, context: "🏁 finish")
     }
     
     public func requestDidResume(_ request: Request) {
-        log.debug(request._logDescription, context: "▶️ resume")
+        logger.log(request._logDescription, context: "▶️ resume")
     }
     
     public func requestDidSuspend(_ request: Request) {
-        log.debug(request._logDescription, context: "⏸ suspend")
+        logger.log(request._logDescription, context: "⏸ suspend")
     }
     
     public func requestIsRetrying(_ request: Request) {
-        log.debug(request._logDescription, context: "🔁 retrying")
+        logger.log(request._logDescription, context: "🔁 retrying")
     }
     
     public func request<Value>(_ request: DataRequest, didParseResponse response: DataResponse<Value, AFError>) {
-        log.debug(
+        logger.log(
             """
             \(request._logDescription)
             ===Response Body===
-            \(log.debug(response.data?.prettyJsonOrDefault ?? "<NO RESPONSE>"))
+            \(response.data?.prettyJsonOrDefault ?? "<NO RESPONSE>")
             ===Response Body END===
             """,
             context: "✅ response"
@@ -60,7 +64,7 @@ public class NetworkMonitorLogger: EventMonitor {
     }
     
     public func request(_ request: DataRequest, didParseResponse response: DataResponse<Data?, AFError>) {
-        log.debug(
+        logger.log(
             """
             \(request._logDescription)
             ===Response Body===

@@ -7,7 +7,6 @@
 
 import Foundation
 import Alamofire
-import PromiseKit
 
 public protocol Middleware {
     /**
@@ -24,7 +23,7 @@ public protocol Middleware {
      Такое решение сделано для того, чтобы можно было писать один блокер для всех типов запросов
      Если бы был строгий <T>, пришлось бы писать для каждого типа запросов отдельный блокер, что не очень удобно
     */
-    typealias RequestBarierBlock = (AnyOperation, Any) -> Promise<Void>
+    typealias RequestBarierBlock = (AnyOperation, Any) async throws -> Void
     func requestBarier(_ requestBarierBlock: @escaping RequestBarierBlock)
 
     typealias ResponseValidationBlock = (_: Int, _ headers: [AnyHashable: Any], _ data: Data?) throws -> Void
@@ -35,7 +34,7 @@ public protocol Middleware {
      
      см. RequestBarierBlock
      */
-    typealias RecoverBlock = (Error, AnyOperation, Any) -> Promise<Void>
+    typealias RecoverBlock = (Error, AnyOperation, Any) async throws -> Void
     func recover(_ recoverBlock: @escaping RecoverBlock)
 
     /**

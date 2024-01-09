@@ -8,7 +8,6 @@
 
 import Foundation
 import Alamofire
-import PromiseKit
 
 public protocol AnyOperation {
     var baseURL: String { get }
@@ -27,7 +26,7 @@ public protocol Operation: AnyOperation {
 }
 
 public extension Operation {
-    func callAsFunction(on apiService: ApiService) -> Promise<ResultType> {
-        apiService.make(self)
+    func callAsFunction(on apiService: ApiService) async throws -> ResultType {
+        try await apiService.make(self)
     }
 }

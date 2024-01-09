@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ShuCore
 import Alamofire
 
 open class CRUDApiResource<ResourceModel: Codable> {

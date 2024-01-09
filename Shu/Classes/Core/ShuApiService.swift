@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 import Alamofire
 
 public class ShuApiService: ApiService {
@@ -91,7 +90,7 @@ public class ShuApiService: ApiService {
             }
         }
 
-        dataRequest.validate({ (request, response, data) -> Request.ValidationResult in
+        dataRequest.validate { (request, response, data) -> Request.ValidationResult in
             // look thru all the middlewares for first responseValidationBlock to throw error
             if let error = self.middlewares.firstResult(where: { (middleware) -> Error? in
                 // if there is any validationblock
@@ -109,63 +108,63 @@ public class ShuApiService: ApiService {
             }
 
             return .success(())
-        })
+        }
 
         return dataRequest
     }
 
-    public func makeRaw<OP: Operation>(_ operation: OP) -> Promise<Data?> {
+    public func makeRaw<OP: Operation>(_ operation: OP) async throws -> Data? {
         let dataRequest: DataRequest = make(operation)
-        
-        return Promise { (resolver) in
+
+        return try await withCheckedThrowingContinuation { cont in
             dataRequest.response(queue: queue) {
                 switch $0.result {
                 case .success(let data):
-                    resolver.fulfill(data)
+                    cont.resume(returning: data)
                 case .failure(let error):
-                    resolver.reject(error)
+                    cont.resume(throwing: error)
                 }
             }
         }
     }
 
-    public func make<OP: Operation>(_ operation: OP) -> Promise<OP.ResultType> {
+    public func make<OP: Operation>(_ operation: OP) async throws -> OP.ResultType {
         let barierBlocks = middlewares.compactMap { $0.requestBarierBlock }
-        return when(fulfilled: barierBlocks.map { $0(operation, OP.ResultType.self) })
-            .then(on: queue) { _ -> Promise<OP.ResultType> in
-                return self.makeRaw(operation)
-                    .map(on: self.queue) { data -> OP.ResultType in
-                        let res = try operation.proceed(data: data)
-                        self.middlewares.forEach { $0.successBlock?(res, operation, OP.ResultType.self) }
-                        return res
-                    }
-                    .recover(on: self.queue) { error throws -> Promise<OP.ResultType> in
-                        return self.handle(error: error, for: operation) as Promise<OP.ResultType>
-                    }
-            }
+
+        for barierBlock in barierBlocks {
+            try await barierBlock(operation, OP.ResultType.self)
+        }
+
+        do {
+            let data = try await makeRaw(operation)
+            let res = try operation.proceed(data: data)
+            middlewares.forEach { $0.successBlock?(res, operation, OP.ResultType.self) }
+            return res
+        } catch {
+            return try await handle(error: error, for: operation)
+        }
     }
 
-    private func handle<OP: Operation>(error: Error, for operation: OP) -> Promise<OP.ResultType> {
+    private func handle<OP: Operation>(error: Error, for operation: OP) async throws -> OP.ResultType {
         var errorPromisesIterator = middlewares
             .compactMap { $0.recoverBlock }
-            .map { $0(error, operation, OP.ResultType.self) }.lazy.makeIterator()
+            .lazy.makeIterator()
 
-        func next() -> Promise<Void> {
+        // .map { $0(error, operation, OP.ResultType.self) }
+
+        func next() async throws -> Void {
             // If there is any next recover block, try it
-            guard let nextRecoverBlock = errorPromisesIterator.next() else { return Promise(error: error) }
+            guard let nextRecoverBlock = errorPromisesIterator.next() else { throw error }
 
-            return nextRecoverBlock
-                // if recover block resolves, resolve promise chain with Void
-                .then(on: queue) { value -> Promise<Void> in
-                    return Promise.value(())
-                }
-                // If recover block raises error, try next recover block
-                .recover(on: queue) { error -> Promise<Void> in
-                    return next()
-                }
+            do {
+                return try await nextRecoverBlock(error, operation, OP.ResultType.self)
+            } catch {
+                return try await next()
+            }
         }
 
         // Start recovering chain. If resolves, try make operation again
-        return next().then { return self.make(operation) }
+        _ = try await next()
+        return try await make(operation)
     }
 }

@@ -7,9 +7,10 @@
 //
 
 import UIKit
-import Shu
+import ShuCore
+import ShuCRUD
+import Shu_PromiseKit
 import PromiseKit
-import SwiftyBeaver
 
 struct Todo: Codable {
     var id: Int = 0
@@ -31,17 +32,21 @@ class TodosResource: CRUDApiResource<[Todo]> {
     }
 }
 
+class SimpleLogger: Logger {
+    func log(_ message: @autoclosure () -> Any, context: Any?) {
+        print("\(String(describing: context)): \(message())")
+    }
+}
+
 class ViewController: UIViewController {
-    private let netMonitorLogger = NetworkMonitorLogger()
+    private let log = SimpleLogger()
+    private var netMonitorLogger: GenericNetworkMonitorLogger!
     private var apiService: ApiService!
-    private let consoleDest = ConsoleDestination()
-    private let log = SwiftyBeaver.self
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        netMonitorLogger = GenericNetworkMonitorLogger(logger: log)
         apiService = ShuApiService(eventMonitors: [netMonitorLogger])
-        consoleDest.format = "$L: $X\n$M\n "
-        log.addDestination(consoleDest)
         // Ожидается, что добавится заголовок X-Foo со значение "Bar"
         apiService.addMiddleware {
             $0.headers { _, _ in return ["X-Foo": "Bar"] }
@@ -73,10 +78,10 @@ class ViewController: UIViewController {
         apiService.addMiddleware {
             $0.success { [log] res, op, opResType in
                 if res is [Todo] {
-                    log.debug("Получили [TODO]", context: "🅰️🅰️🅰️")
+                    log.log("Получили [TODO]", context: "🅰️🅰️🅰️")
                 }
                 if res is Todo {
-                    log.debug("Получили TODO", context: "🅰️🅰️🅰️")
+                    log.log("Получили TODO", context: "🅰️🅰️🅰️")
                 }
             }
         }
@@ -84,28 +89,26 @@ class ViewController: UIViewController {
         apiService.addMiddleware {
             $0.requestBarier { [log] op, opResType in
                 if op is ShuCodableOperation<[Todo]> {
-                    log.debug(
+                    log.log(
                         """
                         Операция будет заблокирована на 5 секунд
                         ShuCodableOperation<[Todo]>
                         """,
                         context: "🅱️🅱️🅱️"
                     )
-                    return after(seconds: 5).asVoid()
+                    try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
                 }
                 
                 if opResType is Todo.Type {
-                    log.debug(
+                    log.log(
                         """
                         Операция будет заблокирована на 7 секунд
                         Shu.Operation<Todo>
                         """,
                         context: "🅱️🅱️🅱️"
                     )
-                    return after(seconds: 7).asVoid()
+                    try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
                 }
-                
-                return Promise.value(())
             }
         }
     }
@@ -131,7 +134,7 @@ class ViewController: UIViewController {
                 return multipleResource.create(object: todos)(on: apiService!)
             }
             .catch { [log] error in
-                log.error(error)
+                log.log(error, context: nil)
             }
     }
 }

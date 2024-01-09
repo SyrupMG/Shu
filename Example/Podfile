@@ -1,8 +1,0 @@
-use_frameworks!
-
-target 'iOS-Example' do
-  pod 'Shu', :path => '../'
-  pod 'Shu/CRUD', :path => '../'
-  pod 'Shu/SwiftyBeaverLog', :path => '../'
-  
-end
